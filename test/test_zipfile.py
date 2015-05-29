@@ -28,6 +28,7 @@ except (UnicodeError, TypeError):
 
 TESTFN2 = TESTFN + "2"
 TESTFNDIR = TESTFN + "d"
+TESTPASS = "cat"
 FIXEDTEST_SIZE = 1000
 
 SMALL_TEST_DATA = [('_ziptest1', '1q2w3e4r5t'),
@@ -1718,12 +1719,30 @@ class UniversalNewlineTests(unittest.TestCase):
         unlink(TESTFN)
         unlink(TESTFN2)
 
+class TestAES(unittest.TestCase):
+    def setUp(self):
+        os.mkdir(TESTFN2)
+
+    def test_extract_dir(self):
+        with zipfile.ZipFile(findfile("example.zip")) as zipf:
+            zipf.setpassword(TESTPASS)
+            zipf.extractall(TESTFN2)
+        self.assertTrue(os.path.isdir(os.path.join(TESTFN2, "example")))
+        self.assertTrue(os.path.isdir(os.path.join(TESTFN2, "example", "dir1")))
+        self.assertTrue(os.path.exists(os.path.join(TESTFN2, "example", "dir1", "text.txt")))
+        self.assertTrue(os.path.isdir(os.path.join(TESTFN2, "example", "dir2")))
+        self.assertTrue(os.path.isdir(os.path.join(TESTFN2, "example", "dir4")))
+
+    def tearDown(self):
+        rmtree(TESTFN2)
+        if os.path.exists(TESTFN):
+            unlink(TESTFN)
 
 def test_main():
     run_unittest(TestsWithSourceFile, TestZip64InSmallFiles, OtherTests,
                  PyZipFileTests, DecryptionTests, TestsWithMultipleOpens,
                  TestWithDirectory, UniversalNewlineTests,
-                 TestsWithRandomBinaryFiles)
+                 TestsWithRandomBinaryFiles, TestAES)
 
 if __name__ == "__main__":
     test_main()
