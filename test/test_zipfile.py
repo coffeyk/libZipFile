@@ -9,7 +9,7 @@ import io
 import sys
 import time
 import struct
-import zipfile
+from src import zipfile
 import unittest
 
 from StringIO import StringIO
